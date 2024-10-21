@@ -9,12 +9,12 @@ services:
             FASTAPI_KEY: ${FASTAPI_KEY}
             FASTAPI_DEBUG: ${FASTAPI_DEBUG}
             MONGODB_DSN: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/${MONGO_INITDB_DATABASE}"
-        command: bash -c 'while !</dev/tcp/psql/5432; do sleep 1; done; uvicorn main:app --host 0.0.0.0'
+        command: uvicorn main:app --host 0.0.0.0
         ports:
             - "8000:8000"
         restart: always
         depends_on:  
-            - psql
+            - mongo
         networks:
             - 3xui_network
 
@@ -26,6 +26,8 @@ services:
       MONGO_INITDB_ROOT_USERNAME: your_username
       MONGO_INITDB_ROOT_PASSWORD: your_password
       MONGO_INITDB_DATABASE: your_database_name
+    networks:
+      - 3xui_network
 
 volumes:
     psql-data: 
