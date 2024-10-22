@@ -10,9 +10,8 @@ app = api_init()
 
 #|=============================[User routes]=============================|
 # 1. /apps/upload
-@app.post("/apps/upload", tags=[Tags.apps], summary="Register user")
-async def user_create(data = Body(example=ex.user_create)):
-    print(data)
-    # r = await api.user_create(data)
-    # return r
+@app.post("/apps/upload", tags=[Tags.apps], summary="insert data")
+async def decrypt(data = Body()):
+    r = await api.decrypt(data)
+    return r
 #--------------------------------------------------------------------------

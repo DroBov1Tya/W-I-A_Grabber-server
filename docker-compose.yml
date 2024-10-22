@@ -3,36 +3,42 @@ services:
   api:
         hostname: fastapi
         container_name: fastapi
-        build: 
+        build:
             context: ./api
         environment:
             FASTAPI_KEY: ${FASTAPI_KEY}
             FASTAPI_DEBUG: ${FASTAPI_DEBUG}
-            MONGODB_DSN: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/${MONGO_INITDB_DATABASE}"
+            MONGODB_DSN: "mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@mongo:27017/${MONGODB_DB}"
+            MONGODB_DB: ${MONGODB_DB}
         command: uvicorn main:app --host 0.0.0.0
         ports:
             - "8000:8000"
         restart: always
-        depends_on:  
+        depends_on:
             - mongo
         networks:
-            - 3xui_network
+            - apps_network
 
   mongo:
     image: mongo:latest
+    restart: always
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: your_username
-      MONGO_INITDB_ROOT_PASSWORD: your_password
-      MONGO_INITDB_DATABASE: your_database_name
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGODB_DB: ${MONGODB_DB}
+      MONGODB_USER: ${MONGODB_USER}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD}
+    volumes:
+      - ./init-mongo:/docker-entrypoint-initdb.d
     networks:
-      - 3xui_network
+      - apps_network
 
 volumes:
-    psql-data: 
+    psql-data:
 
 
 networks:
-    3xui_network:
+    apps_network:
         driver: bridge

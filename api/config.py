@@ -1,6 +1,6 @@
 import os
 import logging
-import motor
+import motor.motor_asyncio
 from enum import Enum
 from fastapi import Depends, HTTPException
 from fastapi.security import APIKeyHeader
@@ -10,12 +10,13 @@ from typing import Any, Dict, List, Tuple, Optional
 
 logger = logging.getLogger(__name__)
 
-debug: str = os.getenv('FASTAPI_DEBUG') # TURN OFF DEBUG ON PROD !!!
+debug: str = os.getenv('FASTAPI_DEBUG')
 apikey: str = os.getenv('FASTAPI_KEY')
 mongodb_dsn: str = os.getenv('MONGODB_DSN')
+db_mongo:str = os.getenv('MONGODB_DB')
 
 # VARS # 
-SECRET_VALUE: str = apikey       # CHANGE ME ON PROD !!!
+SECRET_VALUE: str = apikey
 SECRET_HEADER: str = 'X-API-Key'
 
 
@@ -56,8 +57,6 @@ def api_init():
         logging.info("FastAPI app initialized in debug mode.")
     else:
         app = FastAPIOffline(
-        # docs_url = None, # Disable docs (Swagger UI)
-        # redoc_url = None, # Disable redoc
         dependencies = auth401(),
         title = docs_title,
         description = docs_description,
@@ -65,19 +64,16 @@ def api_init():
 
     return app
 
-# asyncpg wrapper
-
 # motor wrapper
 class MongoDB:
     def __init__(self):
         self.mongo = None
-        self.dsn = mongodb_dsn
         self.db = None
 
     async def connect(self, db_name):
         if self.mongo is None:
-            self.mongo = motor.motor_asyncio.AsyncIOMotorClient(self.dsn)
-        self.db = self.mongo[db_name]  # Устанавливаем базу данных
+            self.mongo = motor.motor_asyncio.AsyncIOMotorClient(mongodb_dsn)
+        self.db = self.mongo[db_name]
         return self.db
 
     async def insert_one(self, collection_name, document):
