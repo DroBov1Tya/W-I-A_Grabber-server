@@ -13,8 +13,8 @@ async def insert_applications_to_mongo(decrypted_data, computer_name):
     # Создаем структуру данных
     structured_data = {
         "computer_name": computer_name,
-        "big_bit": decrypted_data.get('big_bit', {}),
-        "low_bit": decrypted_data.get('low_bit', {})
+        "64_bit": decrypted_data.get('big_bit', {}),
+        "32_bit": decrypted_data.get('low_bit', {})
     }
 
     try:
